@@ -1,4 +1,7 @@
-## Go - KDBush
+# Go - KDBush
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/raditzlawliet/kdbush.svg)](https://pkg.go.dev/github.com/raditzlawliet/kdbush)
+[![codecov](https://codecov.io/gh/raditzlawliet/kdbush/graph/badge.svg?token=0H3J4MQK59)](https://codecov.io/gh/raditzlawliet/kdbush)
 
 Golang KD-Bush implementation
 
@@ -19,7 +22,7 @@ Requirement:
 
 - Go 1.18+ (Generic)
 
-### Usage
+## Usage
 
 Install like usually
 
@@ -118,7 +121,7 @@ for _, v := range newPoints {
 bush.BuildIndex(kdbush.STANDARD_NODE_SIZE)
 ```
 
-### Benchmark
+## Benchmark
 
 All benchmark are run on Go 1.20.3, Windows 11 & 12th Gen Intel(R) Core(TM) i7-12700H (Laptop version).
 
