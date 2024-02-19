@@ -6,6 +6,7 @@ type Point interface {
 	GetY() (Y float64)
 }
 
+// SimplePoint a basic point struct implement [Point]
 type SimplePoint struct {
 	X, Y float64
 }

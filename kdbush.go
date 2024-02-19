@@ -1,8 +1,10 @@
+// Package kdbush implements kdbush-tree
 package kdbush
 
+// STANDARD_NODE_SIZE default nodeSize kdbush-tree. Higher value means faster indexing but slower search and vice versa
 const STANDARD_NODE_SIZE = 64
 
-// KDBush
+// KDBush an instance
 type KDBush struct {
 	Points []Point // pointer
 
@@ -11,7 +13,7 @@ type KDBush struct {
 	coords   []float64
 }
 
-// NewBush
+// NewBush return a new pointer of [KDBush]
 func NewBush() *KDBush {
 	kd := KDBush{
 		Points: []Point{},
@@ -19,19 +21,20 @@ func NewBush() *KDBush {
 	return &kd
 }
 
-// Add
+// Add will add a new pointer point to KDBush instance. This function accept variadic param and return this pointer of KDBush
 func (kd *KDBush) Add(points ...Point) *KDBush {
 	kd.Points = append(kd.Points, points...)
 	return kd
 }
 
-// BuildIndexWith
+// BuildIndexWith will rebuild a new kdtree index with passed []Point with nodeSize.
+// It will throw away previously process [KDBush.Add] and [KDBush.BuildIndex] and replace with the new index.
 func (kd *KDBush) BuildIndexWith(points []Point, nodeSize int) *KDBush {
 	kd.Points = points
 	return kd.BuildIndex(nodeSize)
 }
 
-// BuildIndex
+// BuildIndex will rebuild a new kdtree index with saved Point from [KDBush.Add] or even latest [KDBush.BuildIndexWith] (if any) with [nodeSize].
 func (kd *KDBush) BuildIndex(nodeSize int) *KDBush {
 	kd.nodeSize = nodeSize
 
@@ -49,7 +52,7 @@ func (kd *KDBush) BuildIndex(nodeSize int) *KDBush {
 	return kd
 }
 
-// Range
+// Range will return indexes all points across [minX], [minY], [maxX], [maxY]
 func (kd *KDBush) Range(minX, minY, maxX, maxY float64) []int {
 	stack := [][]int{{0, len(kd.ids) - 1, 0}}
 	result := []int{}
@@ -96,7 +99,7 @@ func (kd *KDBush) Range(minX, minY, maxX, maxY float64) []int {
 	return result
 }
 
-// Within
+// Within will return indexes all point within radius of given single [Point]
 func (kd *KDBush) Within(point Point, radius float64) []int {
 	stack := [][]int{{0, len(kd.ids) - 1, 0}}
 	result := []int{}
