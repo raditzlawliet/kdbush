@@ -74,18 +74,48 @@ points = []kdbush.Point{
     &kdbush.SimplePoint{0.0, -1.0},
     &kdbush.SimplePoint{0.0, -2.0},
 
-// 1. Build Index
+// 1. Build Index (prefered way)
 bush := kdbush.NewBush().
-    BuildIndex([]kdbush.Point(points), kdbush.STANDARD_NODE_SIZE)
+    BuildIndexWith(points, kdbush.STANDARD_NODE_SIZE)
 
 // Ready to use
 // API Range
 indexes := bush.Range(-2.1, 1.0, 2.1, 1.0)
-// [2, 8, 13]
+// [2 8 13]
+for _, v := range indexes {
+  fmt.Println(points[v])
+  fmt.Println(bush.Points[v]) // or
+}
+// &{1 1} &{-1 1} &{0 1}
 
-// API Within
+// API Within Radius
 indexes := bush.Within(&kdbush.SimplePoint{0, 0}, 1)
-// [0, 9, 11, 13, 15]
+// [0 9 11 13 15]
+for _, v := range indexes {
+  fmt.Println(points[v])
+  fmt.Println(bush.Points[v]) // or
+}
+// &{0 0} &{1 0} &{-1 0} &{0 1} &{0 -1}
+
+```
+
+You also can use variadic param when adding points. it will use more alloc, but some case may need it.
+Since index are static. if you need add new point for some case, you can add Index using Add() and rebuild index using BuildIndex()
+_Keep in mind, you will need more resources to rebuild..._
+
+```go
+// Build Index using variadic version (use more alloc)
+bush := kdbush.NewBush().
+    Add(points...).
+    BuildIndex(kdbush.STANDARD_NODE_SIZE)
+
+// Other example
+bush := kdbush.NewBush().
+    BuildIndexWith(points, kdbush.STANDARD_NODE_SIZE)
+for _, v := range newPoints {
+    Add(v)
+}
+bush.BuildIndex(kdbush.STANDARD_NODE_SIZE)
 ```
 
 ### Benchmark
@@ -94,17 +124,27 @@ All benchmark are run on Go 1.20.3, Windows 11 & 12th Gen Intel(R) Core(TM) i7-1
 
 **Do not trust benchmark**
 
-Build Index Benchmark (-benchtime=10s)
+`go test -bench=BenchmarkBuildIndex -benchmem -benchtime=10s`
+
+Build Index With Benchmark (-benchtime=10s); NodeSize=64
 
 ```sh
-BenchmarkBuildIndex/total_1000-20                 795007             17781 ns/op           24576 B/op          2 allocs/op
-BenchmarkBuildIndex/total_10000-20                 22180            540004 ns/op          245760 B/op          2 allocs/op
-BenchmarkBuildIndex/total_100000-20                 1635           7414973 ns/op         2408448 B/op          2 allocs/op
-BenchmarkBuildIndex/total_1000000-20                 141          85518609 ns/op        24010752 B/op          2 allocs/op
-ok      github.com/raditzlawliet/kdbush 75.859s
+BenchmarkBuildIndexWith/total_1000-20             775942             15443 ns/op           24576 B/op          2 allocs/op
+BenchmarkBuildIndexWith/total_10000-20             22734            522197 ns/op          245760 B/op          2 allocs/op
+BenchmarkBuildIndexWith/total_100000-20             1813           6551473 ns/op         2408448 B/op          2 allocs/op
+BenchmarkBuildIndexWith/total_1000000-20             146          84477151 ns/op        24010752 B/op          2 allocs/op
 ```
 
-Range Benchmark
+Build Index (Variadic with Add) Benchmark (-benchtime=10s); NodeSize=64
+
+```sh
+BenchmarkBuildIndex/total_1000-20                 654110             17228 ns/op           40960 B/op          3 allocs/op
+BenchmarkBuildIndex/total_10000-20                 23164            520225 ns/op          409600 B/op          3 allocs/op
+BenchmarkBuildIndex/total_100000-20                 1587           7685670 ns/op         4014080 B/op          3 allocs/op
+BenchmarkBuildIndex/total_1000000-20                 134          89170069 ns/op        40017920 B/op          3 allocs/op
+```
+
+Range Benchmark; NodeSize=64
 
 ```sh
 BenchmarkRange/total_1000-20        790533	      1428 ns/op	     120 B/op	       5 allocs/op
@@ -115,7 +155,7 @@ ok  	github.com/raditzlawliet/kdbush	7.733s
 
 ```
 
-Within Benchmark
+Within Benchmark; NodeSize=64
 
 ```sh
 BenchmarkWithin/total_1000-20       725872	      1524 ns/op	     136 B/op	       6 allocs/op

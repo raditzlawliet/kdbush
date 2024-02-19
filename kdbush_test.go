@@ -45,7 +45,7 @@ func TestGeneration(t *testing.T) {
 	}
 
 	bush := kdbush.NewBush().
-		BuildIndex([]kdbush.Point(points2), kdbush.STANDARD_NODE_SIZE)
+		BuildIndexWith(points2, kdbush.STANDARD_NODE_SIZE)
 
 	if len(bush.Points) != len(points2) {
 		t.Fatalf("Kdbush.Point size %v not same with points2 size %v", len(bush.Points), len(points2))
@@ -56,12 +56,26 @@ func TestGeneration(t *testing.T) {
 			t.Fatalf("Index %v Kdbush.Point %v not same with points2  %v", i, bush.Points[i], points[i])
 		}
 	}
+
+	bush.Add(points2...).
+		BuildIndex(kdbush.STANDARD_NODE_SIZE)
+	points22 := append(points2, points2...)
+
+	if len(bush.Points) != len(points22) {
+		t.Fatalf("Kdbush.Point size %v not same with points22 size %v", len(bush.Points), len(points22))
+	}
+
+	for i := range points22 {
+		if points22[i] != bush.Points[i] {
+			t.Fatalf("Index %v Kdbush.Point %v not same with points22  %v", i, bush.Points[i], points22[i])
+		}
+	}
 }
 
 // Test Range func
 func TestRange(t *testing.T) {
 	bush := kdbush.NewBush().
-		BuildIndex([]kdbush.Point(points), kdbush.STANDARD_NODE_SIZE)
+		BuildIndexWith(points, kdbush.STANDARD_NODE_SIZE)
 
 	if len(bush.Points) != len(points) {
 		t.Fatalf("Kdbush.Point size %v not same with points size %v", len(bush.Points), len(points))
@@ -93,23 +107,26 @@ func TestRange(t *testing.T) {
 	}
 
 	for i, testCase := range testCases {
-		index := bush.Range(testCase.Input[0], testCase.Input[1], testCase.Input[2], testCase.Input[3])
-		if len(index) != len(testCase.Index) {
-			t.Fatalf("case index %v test index size %v not same with result index size %v", i, len(testCase.Index), len(index))
-
+		indexes := bush.Range(testCase.Input[0], testCase.Input[1], testCase.Input[2], testCase.Input[3])
+		if len(indexes) != len(testCase.Index) {
+			t.Fatalf("case index %v test index size %v not same with result index size %v", i, len(testCase.Index), len(indexes))
 		}
-		for k, v := range index {
+		for k, v := range indexes {
 			if points[v] != testCase.Points[k] {
 				t.Fatalf("case index %v result index %v points %v not same with result points %v by index", i, v, points[v], testCase.Points[k])
 			}
 		}
+		// fmt.Println(indexes)
+		// for _, v := range indexes {
+		// 	fmt.Println(points[v])
+		// }
 	}
 }
 
 // Test WIthin func
 func TestWithin(t *testing.T) {
 	bush := kdbush.NewBush().
-		BuildIndex([]kdbush.Point(points), kdbush.STANDARD_NODE_SIZE)
+		BuildIndexWith(points, kdbush.STANDARD_NODE_SIZE)
 
 	if len(bush.Points) != len(points) {
 		t.Fatalf("Kdbush.Point size %v not same with points size %v", len(bush.Points), len(points))
@@ -148,15 +165,19 @@ func TestWithin(t *testing.T) {
 	}
 
 	for i, testCase := range testCases {
-		index := bush.Within(&kdbush.SimplePoint{testCase.Input[0], testCase.Input[1]}, testCase.Input[2])
-		if len(index) != len(testCase.Index) {
-			t.Fatalf("case index %v test index size %v not same with result index size %v", i, len(testCase.Index), len(index))
+		indexes := bush.Within(&kdbush.SimplePoint{testCase.Input[0], testCase.Input[1]}, testCase.Input[2])
+		if len(indexes) != len(testCase.Index) {
+			t.Fatalf("case index %v test index size %v not same with result index size %v", i, len(testCase.Index), len(indexes))
 
 		}
-		for k, v := range index {
+		for k, v := range indexes {
 			if points[v] != testCase.Points[k] {
 				t.Fatalf("case index %v result index %v points %v not same with result points %v by index", i, v, points[v], testCase.Points[k])
 			}
 		}
+		// fmt.Println(indexes)
+		// for _, v := range indexes {
+		// 	fmt.Println(points[v])
+		// }
 	}
 }
