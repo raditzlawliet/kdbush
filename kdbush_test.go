@@ -143,7 +143,7 @@ func TestWithin(t *testing.T) {
 // Test Within func with Lower Node Size
 func TestWithinLowNodeSize(t *testing.T) {
 	bush := kdbush.NewBush().
-		BuildIndexWith(points, 16)
+		BuildIndexWith(points, 4)
 
 	assert.ElementsMatch(t, bush.Points, points, "they should be have same elements")
 
