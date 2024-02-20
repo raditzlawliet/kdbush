@@ -17,7 +17,7 @@ func sort(ids []int, coords []float64, nodeSize, left, right, axis int) {
 
 	m := (left + right) >> 1
 
-	selection(ids, coords, nodeSize, left, right, axis)
+	selection(ids, coords, m, left, right, axis)
 
 	sort(ids, coords, nodeSize, left, m-1, 1-axis)
 	sort(ids, coords, nodeSize, m+1, right, 1-axis)

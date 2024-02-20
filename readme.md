@@ -148,22 +148,21 @@ BenchmarkBuildIndex/total_1000000-20                 134          89170069 ns/op
 ```
 
 Range Benchmark; NodeSize=64
+`go test -bench=BenchmarkRange -benchmem -benchtime=10s`
 
 ```sh
-BenchmarkRange/total_1000-20        790533	      1428 ns/op	     120 B/op	       5 allocs/op
-BenchmarkRange/total_10000-20       795254	      1424 ns/op	     216 B/op	       9 allocs/op
-BenchmarkRange/total_100000-20      647720	      1898 ns/op	     288 B/op	      12 allocs/op
-BenchmarkRange/total_1000000-20     525925	      2313 ns/op	     360 B/op	      15 allocs/op
-ok  	github.com/raditzlawliet/kdbush	7.733s
-
+BenchmarkRange/total_1000-20            65190181               176.3 ns/op           120 B/op          5 allocs/op
+BenchmarkRange/total_10000-20           52118530               228.9 ns/op           216 B/op          9 allocs/op
+BenchmarkRange/total_100000-20          40806165               291.6 ns/op           288 B/op         12 allocs/op
+BenchmarkRange/total_1000000-20         33790890               370.8 ns/op           360 B/op         15 allocs/op
 ```
 
 Within Benchmark; NodeSize=64
+`go test -bench=BenchmarkWithin -benchmem -benchtime=10s`
 
 ```sh
-BenchmarkWithin/total_1000-20       725872	      1524 ns/op	     136 B/op	       6 allocs/op
-BenchmarkWithin/total_10000-20      771256	      1490 ns/op	     232 B/op	      10 allocs/op
-BenchmarkWithin/total_100000-20     619287	      1938 ns/op	     304 B/op	      13 allocs/op
-BenchmarkWithin/total_1000000-20    550041	      2350 ns/op	     376 B/op	      16 allocs/op
-ok  	github.com/raditzlawliet/kdbush	7.747s
+BenchmarkWithin/total_1000-20           61684923               182.4 ns/op           136 B/op          6 allocs/op
+BenchmarkWithin/total_10000-20          50331452               239.6 ns/op           232 B/op         10 allocs/op
+BenchmarkWithin/total_100000-20         39742231               300.8 ns/op           304 B/op         13 allocs/op
+BenchmarkWithin/total_1000000-20        32219763               374.3 ns/op           376 B/op         16 allocs/op
 ```

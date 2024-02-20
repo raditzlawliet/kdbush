@@ -60,13 +60,13 @@ func (kd *KDBush) Range(minX, minY, maxX, maxY float64) []int {
 	var x, y float64
 
 	for (len(stack)) > 0 {
-		axis := stack[len(stack)-1][0]
+		left := stack[len(stack)-1][0]
 		right := stack[len(stack)-1][1]
-		left := stack[len(stack)-1][2]
+		axis := stack[len(stack)-1][2]
 		stack = append(stack[:len(stack)-1], stack[len(stack):]...) // .pop()
 
 		// search linearly
-		if (right - left) <= kd.nodeSize {
+		if right-left <= kd.nodeSize {
 			for i := left; i <= right; i++ {
 				x = kd.coords[2*i]
 				y = kd.coords[2*i+1]
@@ -104,23 +104,21 @@ func (kd *KDBush) Within(point Point, radius float64) []int {
 	stack := [][]int{{0, len(kd.ids) - 1, 0}}
 	result := []int{}
 
-	// r2 := radius * 2
 	r2 := radius * radius
 
 	qx, qy := point.GetX(), point.GetY()
 	var x, y float64
 
 	for (len(stack)) > 0 {
-		axis := stack[len(stack)-1][0]
+		left := stack[len(stack)-1][0]
 		right := stack[len(stack)-1][1]
-		left := stack[len(stack)-1][2]
+		axis := stack[len(stack)-1][2]
 		stack = append(stack[:len(stack)-1], stack[len(stack):]...) // .pop()
 
 		// search linearly
 		if right-left <= kd.nodeSize {
 			for i := left; i <= right; i++ {
-				a := sqrtDist(kd.coords[2*i], kd.coords[2*i+1], qx, qy)
-				if a <= r2 {
+				if sqrtDist(kd.coords[2*i], kd.coords[2*i+1], qx, qy) <= r2 {
 					result = append(result, kd.ids[i])
 				}
 			}
