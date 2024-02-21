@@ -8,6 +8,7 @@ const STANDARD_NODE_SIZE = 64
 type KDBush struct {
 	Points []Point // pointer
 
+	// avoid change on-the-fly
 	nodeSize int
 	ids      []int
 	coords   []float64
@@ -145,4 +146,16 @@ func (kd *KDBush) Within(point Point, radius float64) []int {
 	}
 
 	return result
+}
+
+func (kd *KDBush) GetNodeSize() int {
+	return kd.nodeSize
+}
+
+func (kd *KDBush) GetIndexes() []int {
+	return kd.ids
+}
+
+func (kd *KDBush) GetCoords() []float64 {
+	return kd.coords
 }

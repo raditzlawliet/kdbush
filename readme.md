@@ -14,6 +14,10 @@ A very fast static spatial index for 2D points based on a flat KD-tree
   - Range: return indexes within 2 point
   - Within: return indexes within radius of point
 
+Extension
+
+- [Geo Ext.](https://github.com/raditzlawliet/kdbush/geo) A simple geographic extension for Golang port of KDBush, support get point around location coordinates
+
 This implementation is based on:
 
 - [Javascript - KDBush](https://github.com/mourner/kdbush)
