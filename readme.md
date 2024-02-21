@@ -10,7 +10,7 @@ A very fast static spatial index for 2D points based on a flat KD-tree and almos
 - 2 Dimensional Points only — no rectangles.
 - Static — you can't add/remove items after initial indexing (You need to rebuild index)
 - Faster indexing and search, with lower memory footprint
-- Build-in API with **Zero-Allocation** (See [#Benchmark](#benchmark))
+- Build-in API with almost **Zero-Allocation** (See [#Benchmark](#benchmark))
   - Range: return indexes within 2 point
   - Within: return indexes within radius of point
 
