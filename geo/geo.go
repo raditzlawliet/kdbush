@@ -14,7 +14,10 @@ const (
 )
 
 func Around(bush *kdbush.KDBush, lng, lat float64, maxResults int, maxDistanceInKm float64, predicate func(int) bool) []int {
-	maxHaverSinDist := haverSin(maxDistanceInKm / earthRadius)
+	maxHaverSinDist := 1.0
+	if maxDistanceInKm >= 0 {
+		maxHaverSinDist = haverSin(maxDistanceInKm / earthRadius)
+	}
 	result := []int{}
 
 	// a distance-sorted priority queue that will contain both points and kd-tree q

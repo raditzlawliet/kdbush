@@ -40,48 +40,64 @@ func TestSimpleAround(t *testing.T) {
 
 	assert.ElementsMatch(t, bush.Points, points, "they should be have same elements")
 
-	type testCase struct {
+	testCases := []struct {
+		Name         string
 		Input        kdbush.Point
 		MaxResult    int
 		Distance     float64
 		Result       []int
 		ResultPoints []kdbush.Point
-	}
-	testCases := []testCase{
-		// All Surabaya exclude fartest one
+	}{
 		{
+			"All Surabaya closest 5 within 10km",
 			points[0],
 			5,
 			10,
 			[]int{0, 1, 2, 3, 4},
 			[]kdbush.Point{points[0], points[1], points[2], points[3], points[4]},
 		},
-		// All Jakarta
 		{
+			"All Jakarta closest 2 within 10km",
 			points[7],
 			5,
 			10,
 			[]int{6, 7},
 			[]kdbush.Point{points[6], points[7]},
 		},
-		// All
 		{
+			"All",
 			points[6],
-			1000,
-			1000,
+			-1,
+			-1,
 			[]int{0, 1, 2, 3, 4, 5, 6, 7},
 			points,
+		},
+		{
+			"Closest 2 all distance",
+			points[7],
+			2,
+			-1,
+			[]int{6, 7},
+			[]kdbush.Point{points[6], points[7]},
+		},
+		{
+			"All point within distance",
+			points[6],
+			-1,
+			10,
+			[]int{6, 7},
+			[]kdbush.Point{points[6], points[7]},
 		},
 	}
 
 	for _, testCase := range testCases {
 		results := geo.Around(bush, testCase.Input.GetX(), testCase.Input.GetY(), testCase.MaxResult, testCase.Distance, nil)
-		assert.ElementsMatch(t, results, testCase.Result, "Result element index should same")
+		assert.ElementsMatch(t, results, testCase.Result, "[%v] Result element index should same", testCase.Name)
 
 		resultPoints := []kdbush.Point{}
 		for _, v := range results {
 			resultPoints = append(resultPoints, points[v])
 		}
-		assert.ElementsMatch(t, resultPoints, testCase.ResultPoints, "Result element point should same")
+		assert.ElementsMatch(t, resultPoints, testCase.ResultPoints, "[%v] Result element point should same", testCase.Name)
 	}
 }
