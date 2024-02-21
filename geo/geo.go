@@ -13,14 +13,9 @@ const (
 	rad         = math.Pi / 180
 )
 
-func Around(index kdbush.KDBush, lng, lat float64, maxResults int, maxDistance float64, predicate func(int) bool) []int {
-	maxHaverSinDist := 1.0
+func Around(bush *kdbush.KDBush, lng, lat float64, maxResults int, maxDistanceInKm float64, predicate func(int) bool) []int {
+	maxHaverSinDist := haverSin(maxDistanceInKm / earthRadius)
 	result := []int{}
-
-	if maxDistance >= 0 {
-		maxHaverSinDist = haverSin(maxDistance / earthRadius)
-		_ = maxHaverSinDist
-	}
 
 	// a distance-sorted priority queue that will contain both points and kd-tree q
 	q := geoNodeQueue{}
@@ -28,11 +23,11 @@ func Around(index kdbush.KDBush, lng, lat float64, maxResults int, maxDistance f
 
 	// an object that represents the top kd-tree node (the whole Earth)
 	node := &geoNode{
-		left:   0,                           // left index in the kd-tree array
-		right:  len(index.GetIndexes()) - 1, // right index
-		axis:   0,                           // 0 for longitude axis and 1 for latitude axis
-		dist:   0,                           // will hold the lower bound of children's distances to the query point
-		minLng: -180,                        // bounding box of the node
+		left:   0,                          // left index in the kd-tree array
+		right:  len(bush.GetIndexes()) - 1, // right index
+		axis:   0,                          // 0 for longitude axis and 1 for latitude axis
+		dist:   0,                          // will hold the lower bound of children's distances to the query point
+		minLng: -180,                       // bounding box of the node
 		minLat: -90,
 		maxLng: 180,
 		maxLat: 90,
@@ -44,16 +39,16 @@ func Around(index kdbush.KDBush, lng, lat float64, maxResults int, maxDistance f
 		right := node.right
 		left := node.left
 
-		if right-left <= index.GetNodeSize() {
+		if right-left <= bush.GetNodeSize() {
 			// leaf node
 
 			// add all points of the leaf node to the queue
 			for i := left; i <= right; i++ {
-				itemId := index.GetIndexes()[i]
+				itemId := bush.GetIndexes()[i]
 				if predicate == nil || (predicate != nil && predicate(itemId)) {
 					heap.Push(&q, &geoNode{
 						itemID: nullInt{itemId, true},
-						dist:   haverSinDist(lng, lat, index.GetCoords()[2*i], index.GetCoords()[2*i+1], cosLat),
+						dist:   haverSinDist(lng, lat, bush.GetCoords()[2*i], bush.GetCoords()[2*i+1], cosLat),
 					})
 				}
 			}
@@ -61,11 +56,11 @@ func Around(index kdbush.KDBush, lng, lat float64, maxResults int, maxDistance f
 			// not a leaf node (has child nodes)
 
 			mid := (left + right) >> 1 // middle index
-			midLng := index.GetCoords()[2*mid]
-			midLat := index.GetCoords()[2*mid+1]
+			midLng := bush.GetCoords()[2*mid]
+			midLat := bush.GetCoords()[2*mid+1]
 
 			// add middle point to the queue
-			itemId := index.GetIndexes()[mid]
+			itemId := bush.GetIndexes()[mid]
 			if predicate == nil || (predicate != nil && predicate(itemId)) {
 				heap.Push(&q, &geoNode{
 					itemID: nullInt{itemId, true},
@@ -82,8 +77,8 @@ func Around(index kdbush.KDBush, lng, lat float64, maxResults int, maxDistance f
 				axis:   nextAxis,
 				minLng: node.minLng,
 				minLat: node.minLat,
-				maxLng: midLng,
-				maxLat: midLat,
+				maxLng: node.maxLng,
+				maxLat: node.maxLat,
 				dist:   0,
 			}
 
@@ -92,20 +87,20 @@ func Around(index kdbush.KDBush, lng, lat float64, maxResults int, maxDistance f
 				left:   mid + 1,
 				right:  right,
 				axis:   nextAxis,
-				minLng: midLng,
-				minLat: midLat,
+				minLng: node.minLng,
+				minLat: node.minLat,
 				maxLng: node.maxLng,
 				maxLat: node.maxLat,
 				dist:   0,
 			}
 
 			if node.axis == 0 {
-				leftNode.maxLat = node.maxLat
-				rightNode.minLat = node.minLat
+				leftNode.maxLng = midLng
+				rightNode.minLng = midLng
 			}
 			if node.axis == 1 {
-				leftNode.maxLng = node.maxLng
-				rightNode.minLng = node.minLng
+				leftNode.maxLat = midLat
+				rightNode.minLat = midLat
 			}
 
 			leftNode.dist = boxDist(lng, lat, cosLat, leftNode)
@@ -130,8 +125,8 @@ func Around(index kdbush.KDBush, lng, lat float64, maxResults int, maxDistance f
 		}
 
 		// the next closest kd-tree node
-		if n := heap.Pop(&q); n != nil {
-			node = n.(*geoNode)
+		if len(q) > 0 {
+			node = heap.Pop(&q).(*geoNode)
 		} else {
 			node = nil
 		}

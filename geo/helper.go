@@ -10,7 +10,8 @@ func boxDist(lng, lat, cosLat float64, node *geoNode) float64 {
 	if lng >= node.minLng && lng <= node.maxLng {
 		if lat < node.minLat {
 			return haverSin((lat - node.minLat) * rad)
-		} else if lat > node.maxLat {
+		}
+		if lat > node.maxLat {
 			return haverSin((lat - node.maxLat) * rad)
 		}
 		return 0
@@ -59,7 +60,7 @@ func vertexLat(lat, haverSinDLng float64) float64 {
 	return math.Atan(math.Tan(lat*rad)/cosDLng) / rad
 }
 
-// Distance calculate distance between 2 point lnglat, useful func
+// Distance return great circle distance between two locations in kilometers
 func Distance(lng1, lat1, lng2, lat2 float64) float64 {
 	h := haverSinDist(lng1, lat1, lng2, lat2, math.Cos(lat1*rad))
 	return 2 * earthRadius * math.Asin(math.Sqrt(h))

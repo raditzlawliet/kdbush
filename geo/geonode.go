@@ -31,7 +31,7 @@ type geoNodeQueue []*geoNode
 func (q geoNodeQueue) Len() int { return len(q) }
 
 func (q geoNodeQueue) Less(i, j int) bool {
-	return q[i].dist > q[j].dist
+	return q[i].dist < q[j].dist
 }
 
 func (q geoNodeQueue) Swap(i, j int) {
