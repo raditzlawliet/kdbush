@@ -5,12 +5,12 @@
 
 Golang KD-Bush implementation
 
-A very fast static spatial index for 2D points based on a flat KD-tree
+A very fast static spatial index for 2D points based on a flat KD-tree and almost Zero-Allocation
 
 - 2 Dimensional Points only — no rectangles.
 - Static — you can't add/remove items after initial indexing (You need to rebuild index)
 - Faster indexing and search, with lower memory footprint
-- Build-in feat
+- Build-in API with almost **Zero-Allocation** (See [#Benchmark](#benchmark))
   - Range: return indexes within 2 point
   - Within: return indexes within radius of point
 
@@ -83,7 +83,7 @@ points = []kdbush.Point{
 
 // 1. Build Index (prefered way)
 bush := kdbush.NewBush().
-    BuildIndexWith(points, kdbush.STANDARD_NODE_SIZE)
+    BuildIndex(points, kdbush.STANDARD_NODE_SIZE)
 
 // Ready to use
 // API Range
@@ -91,39 +91,58 @@ indexes := bush.Range(-2.1, 1.0, 2.1, 1.0)
 // [2 8 13]
 for _, v := range indexes {
   fmt.Println(points[v])
-  fmt.Println(bush.Points[v]) // or
 }
 // &{1 1} &{-1 1} &{0 1}
 
-// API Within Radius
-indexes := bush.Within(&kdbush.SimplePoint{0, 0}, 1)
+// API Within X, Y with Radius
+indexes := bush.Within(0, 0, 1)
 // [0 9 11 13 15]
 for _, v := range indexes {
   fmt.Println(points[v])
-  fmt.Println(bush.Points[v]) // or
 }
 // &{0 0} &{1 0} &{-1 0} &{0 1} &{0 -1}
 
 ```
 
-You also can use variadic param when adding points. it will use more alloc, but some case may need it.
-Since index are static. if you need add new point for some case, you can add Index using Add() and rebuild index using BuildIndex()
+kDBush library didn't store original slices to avoid duplication slice
+
+Since index are static. if you need rebuild or adding new point for some case, you can call BuildIndex() multiple times.
 _Keep in mind, you will need more resources to rebuild..._
 
 ```go
-// Build Index using variadic version (use more alloc)
 bush := kdbush.NewBush().
-    Add(points...).
-    BuildIndex(kdbush.STANDARD_NODE_SIZE)
-
-// Other example
-bush := kdbush.NewBush().
-    BuildIndexWith(points, kdbush.STANDARD_NODE_SIZE)
-for _, v := range newPoints {
-    Add(v)
-}
-bush.BuildIndex(kdbush.STANDARD_NODE_SIZE)
+  BuildIndex(points, kdbush.STANDARD_NODE_SIZE)
+points.Add(newPoint)
+bush.BuildIndex(points, kdbush.STANDARD_NODE_SIZE)
 ```
+
+To avoid datarace on concurrency, please make sure lock bush when build index and you also can check it's already indexed or not via KDBush.Indexed()
+
+## API
+
+### BuildIndex(points, nodeSize) \*KDBush
+
+bulding kd-tree index given list of `points` and `nodeSize`, and return `*KDBush`
+
+- `points`: list Point interface `[]Point`
+- `nodeSize`: kd-tree node size. Standard Node Size is 64. Higher value means faster indexing but slower search and vice versa. `int`
+
+### Range(minX, minY, maxX, maxY) []int
+
+return all indexes points across 2 point `minX`, `minY`, `maxX`, `maxY`
+
+- `minX`: point X of A `float64`
+- `minY`: point Y of A `float64`
+- `maxX`: point X of B `float64`
+- `maxY`: point Y of B `float64`
+
+### Within(x, y, radius) []int
+
+return all indexes points within `radius` of given single point `x`, `y`
+
+- `x`: X point `float64`
+- `y`: Y point `float64`
+- `radius`: radius to search within `float64`
 
 ## Benchmark
 
@@ -131,42 +150,41 @@ All benchmark are run on Go 1.20.3, Windows 11 & 12th Gen Intel(R) Core(TM) i7-1
 
 **Do not trust benchmark**
 
-`go test -bench=BenchmarkBuildIndex -benchmem -benchtime=10s`
+`go test -bench=. -benchmem -benchtime=10s`
 
-Build Index With Benchmark (-benchtime=10s); NodeSize=64
-
-```sh
-BenchmarkBuildIndexWith/total_1000-20             775942             15443 ns/op           24576 B/op          2 allocs/op
-BenchmarkBuildIndexWith/total_10000-20             22734            522197 ns/op          245760 B/op          2 allocs/op
-BenchmarkBuildIndexWith/total_100000-20             1813           6551473 ns/op         2408448 B/op          2 allocs/op
-BenchmarkBuildIndexWith/total_1000000-20             146          84477151 ns/op        24010752 B/op          2 allocs/op
-```
-
-Build Index (Variadic with Add) Benchmark (-benchtime=10s); NodeSize=64
+Benchmark (-benchtime=10s); NodeSize=64
 
 ```sh
-BenchmarkBuildIndex/total_1000-20                 654110             17228 ns/op           40960 B/op          3 allocs/op
-BenchmarkBuildIndex/total_10000-20                 23164            520225 ns/op          409600 B/op          3 allocs/op
-BenchmarkBuildIndex/total_100000-20                 1587           7685670 ns/op         4014080 B/op          3 allocs/op
-BenchmarkBuildIndex/total_1000000-20                 134          89170069 ns/op        40017920 B/op          3 allocs/op
-```
-
-Range Benchmark; NodeSize=64
-`go test -bench=BenchmarkRange -benchmem -benchtime=10s`
-
-```sh
-BenchmarkRange/total_1000-20            65190181               176.3 ns/op           120 B/op          5 allocs/op
-BenchmarkRange/total_10000-20           52118530               228.9 ns/op           216 B/op          9 allocs/op
-BenchmarkRange/total_100000-20          40806165               291.6 ns/op           288 B/op         12 allocs/op
-BenchmarkRange/total_1000000-20         33790890               370.8 ns/op           360 B/op         15 allocs/op
-```
-
-Within Benchmark; NodeSize=64
-`go test -bench=BenchmarkWithin -benchmem -benchtime=10s`
-
-```sh
-BenchmarkWithin/total_1000-20           61684923               182.4 ns/op           136 B/op          6 allocs/op
-BenchmarkWithin/total_10000-20          50331452               239.6 ns/op           232 B/op         10 allocs/op
-BenchmarkWithin/total_100000-20         39742231               300.8 ns/op           304 B/op         13 allocs/op
-BenchmarkWithin/total_1000000-20        32219763               374.3 ns/op           376 B/op         16 allocs/op
+BenchmarkBuildIndex/nodeSize_64_total_1000-20             566725             20356 ns/op           24576 B/op          2 allocs/op
+BenchmarkBuildIndex/nodeSize_64_total_10000-20             13802            876863 ns/op          245760 B/op          2 allocs/op
+BenchmarkBuildIndex/nodeSize_64_total_100000-20             1122          10741001 ns/op         2408451 B/op          2 allocs/op
+BenchmarkBuildIndex/nodeSize_64_total_1000000-20             100         122507051 ns/op        24010786 B/op          2 allocs/op
+BenchmarkBuildIndex/nodeSize_8_total_1000-20              181689             66618 ns/op           24576 B/op          2 allocs/op
+BenchmarkBuildIndex/nodeSize_8_total_10000-20              10000           1151113 ns/op          245760 B/op          2 allocs/op
+BenchmarkBuildIndex/nodeSize_8_total_100000-20               805          14646166 ns/op         2408448 B/op          2 allocs/op
+BenchmarkBuildIndex/nodeSize_8_total_1000000-20               72         161955225 ns/op        24010752 B/op          2 allocs/op
+BenchmarkRange/nodeSize_64_total_10-20                  839765822               14.11 ns/op            0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_64_total_100-20                 157284577               76.62 ns/op            0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_64_total_1000-20                100000000              100.4 ns/op             0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_64_total_10000-20               165987278               72.31 ns/op            0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_64_total_100000-20              125252017               97.03 ns/op            0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_64_total_1000000-20             97950468               125.1 ns/op             0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_8_total_10-20                   1000000000               8.681 ns/op           0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_8_total_100-20                  696466574               17.35 ns/op            0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_8_total_1000-20                 460818502               26.25 ns/op            0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_8_total_10000-20                303527074               39.56 ns/op            0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_8_total_100000-20               243663084               48.67 ns/op            0 B/op          0 allocs/op
+BenchmarkRange/nodeSize_8_total_1000000-20              194835972               60.02 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_64_total_10-20                 984755572               12.07 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_64_total_100-20                176766757               67.20 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_64_total_1000-20               134922337               89.54 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_64_total_10000-20              192972932               62.07 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_64_total_100000-20             151349331               79.71 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_64_total_1000000-20            100000000              101.4 ns/op             0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_8_total_10-20                  1000000000               8.625 ns/op           0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_8_total_100-20                 612873906               19.54 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_8_total_1000-20                425276205               27.61 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_8_total_10000-20               302259685               40.02 ns/op            0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_8_total_100000-20              100000000              136.8 ns/op             0 B/op          0 allocs/op
+BenchmarkWithin/nodeSize_8_total_1000000-20             203591168               56.46 ns/op            0 B/op          0 allocs/op
 ```

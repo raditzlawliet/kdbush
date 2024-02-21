@@ -63,7 +63,7 @@ func extract() {
 	}
 }
 
-// Benchmark BuildIndexWith func
+// Benchmark BuildIndex func
 func BenchmarkGeo(b *testing.B) {
 	extract()
 
@@ -119,7 +119,7 @@ func BenchmarkGeo(b *testing.B) {
 	// Benchmark query 1000 closest with different total data
 	for _, v := range cases {
 		bush := kdbush.NewBush().
-			BuildIndexWith(v.Points, kdbush.STANDARD_NODE_SIZE)
+			BuildIndex(v.Points, kdbush.STANDARD_NODE_SIZE)
 
 		b.Run(fmt.Sprintf("AroundClosest1kWithData_%d", v.Total), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -131,7 +131,7 @@ func BenchmarkGeo(b *testing.B) {
 	// Benchmark query 50000 closest with different total data
 	for _, v := range cases {
 		bush := kdbush.NewBush().
-			BuildIndexWith(v.Points, kdbush.STANDARD_NODE_SIZE)
+			BuildIndex(v.Points, kdbush.STANDARD_NODE_SIZE)
 
 		b.Run(fmt.Sprintf("AroundClosest5kWithData_%d", v.Total), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -143,7 +143,7 @@ func BenchmarkGeo(b *testing.B) {
 	// Benchmark query all data
 	for _, v := range cases {
 		bush := kdbush.NewBush().
-			BuildIndexWith(v.Points, kdbush.STANDARD_NODE_SIZE)
+			BuildIndex(v.Points, kdbush.STANDARD_NODE_SIZE)
 
 		b.Run(fmt.Sprintf("AroundWithData_%d", v.Total), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -155,7 +155,7 @@ func BenchmarkGeo(b *testing.B) {
 	// Benchmark query closest random point
 	for _, v := range cases {
 		bush := kdbush.NewBush().
-			BuildIndexWith(v.Points, kdbush.STANDARD_NODE_SIZE)
+			BuildIndex(v.Points, kdbush.STANDARD_NODE_SIZE)
 
 		index := rand.Intn(len(v.Points))
 
