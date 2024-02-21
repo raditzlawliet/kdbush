@@ -16,7 +16,7 @@ A very fast static spatial index for 2D points based on a flat KD-tree
 
 Extension
 
-- [Geo Ext.](https://github.com/raditzlawliet/kdbush/geo) A simple geographic extension for Golang port of KDBush, support get point around location coordinates
+- [Geo Ext.](geo) A simple geographic extension for Golang port of KDBush, support get point around location coordinates
 
 This implementation is based on:
 
