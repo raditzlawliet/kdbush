@@ -4,6 +4,8 @@ import (
 	"math"
 )
 
+// This helper is for kdbush functionality
+
 // Number
 type Number interface {
 	float64 | int
