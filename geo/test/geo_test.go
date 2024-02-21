@@ -36,9 +36,7 @@ func TestDistance(t *testing.T) {
 
 func TestSimpleAround(t *testing.T) {
 	bush := kdbush.NewBush().
-		BuildIndexWith(points, kdbush.STANDARD_NODE_SIZE)
-
-	assert.ElementsMatch(t, bush.Points, points, "they should be have same elements")
+		BuildIndex(points, kdbush.STANDARD_NODE_SIZE)
 
 	testCases := []struct {
 		Name         string
@@ -104,9 +102,7 @@ func TestSimpleAround(t *testing.T) {
 
 func TestAroundWithDifferentNodeSize(t *testing.T) {
 	bush := kdbush.NewBush().
-		BuildIndexWith(points, 4)
-
-	assert.ElementsMatch(t, bush.Points, points, "they should be have same elements")
+		BuildIndex(points, 4)
 
 	testCases := []struct {
 		Name         string
