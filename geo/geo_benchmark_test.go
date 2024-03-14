@@ -17,20 +17,21 @@ import (
 	"github.com/raditzlawliet/kdbush/geo"
 )
 
-var dst = "output"
+var unzipPath = "testdata/output"
+var dataPath = "testdata/cities5000.zip"
 
 func extract() {
-	archive, err := zip.OpenReader("cities5000.zip")
+	archive, err := zip.OpenReader(dataPath)
 	if err != nil {
 		panic(err)
 	}
 	defer archive.Close()
 
 	for _, f := range archive.File {
-		filePath := filepath.Join(dst, f.Name)
+		filePath := filepath.Join(unzipPath, f.Name)
 		fmt.Println("unzipping file ", filePath)
 
-		if !strings.HasPrefix(filePath, filepath.Clean(dst)+string(os.PathSeparator)) {
+		if !strings.HasPrefix(filePath, filepath.Clean(unzipPath)+string(os.PathSeparator)) {
 			fmt.Println("invalid file path")
 			return
 		}
@@ -70,7 +71,7 @@ func BenchmarkGeo(b *testing.B) {
 	cities := []kdbush.Point{}
 
 	// prepare data benchmark
-	file, err := os.Open(filepath.Join(dst, "cities5000.txt"))
+	file, err := os.Open(filepath.Join(unzipPath, "cities5000.txt"))
 	if err != nil {
 		panic(err)
 	}
