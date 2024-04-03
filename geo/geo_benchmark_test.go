@@ -153,12 +153,14 @@ func BenchmarkGeo(b *testing.B) {
 		})
 	}
 
+	var rng = rand.New(rand.NewSource(1))
+
 	// Benchmark query closest random point
 	for _, v := range cases {
 		bush := kdbush.NewBush().
 			BuildIndex(v.Points, kdbush.STANDARD_NODE_SIZE)
 
-		index := rand.Intn(len(v.Points))
+		index := rng.Intn(len(v.Points))
 
 		b.Run(fmt.Sprintf("AroundClosest1RanndomWithData_%d", v.Total), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -168,9 +170,9 @@ func BenchmarkGeo(b *testing.B) {
 	}
 
 	// Benchmark Distance, get random loc from latest case
-	index1 := rand.Intn(len(cases[len(cases)-1].Points))
+	index1 := rng.Intn(len(cases[len(cases)-1].Points))
 	point1 := cases[len(cases)-1].Points[index1]
-	index2 := rand.Intn(len(cases[len(cases)-1].Points))
+	index2 := rng.Intn(len(cases[len(cases)-1].Points))
 	point2 := cases[len(cases)-1].Points[index2]
 
 	b.Run(fmt.Sprintf("Distance"), func(b *testing.B) {

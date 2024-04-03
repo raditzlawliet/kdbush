@@ -10,6 +10,8 @@ import (
 
 // Benchmark BuildIndex func
 func BenchmarkBuildIndex(b *testing.B) {
+	var rng = rand.New(rand.NewSource(1))
+
 	var points = []struct {
 		Points   []kdbush.Point
 		Total    int
@@ -28,7 +30,7 @@ func BenchmarkBuildIndex(b *testing.B) {
 	// Setup
 	for num := range points {
 		for i := 0; i < points[num].Total; i++ {
-			points[num].Points = append(points[num].Points, &kdbush.SimplePoint{rand.Float64()*24.0 + 24.0, rand.Float64()*24.0 + 24.0})
+			points[num].Points = append(points[num].Points, &kdbush.SimplePoint{rng.Float64()*24.0 + 24.0, rng.Float64()*24.0 + 24.0})
 		}
 
 	}
@@ -45,6 +47,8 @@ func BenchmarkBuildIndex(b *testing.B) {
 
 // Benchmark Range func
 func BenchmarkRange(b *testing.B) {
+	var rng = rand.New(rand.NewSource(1))
+
 	var points = []struct {
 		Points   []kdbush.Point
 		Total    int
@@ -68,7 +72,7 @@ func BenchmarkRange(b *testing.B) {
 	// Setup
 	for num := range points {
 		for i := 0; i < points[num].Total; i++ {
-			points[num].Points = append(points[num].Points, &kdbush.SimplePoint{rand.Float64()*24.0 + 24.0, rand.Float64()*24.0 + 24.0})
+			points[num].Points = append(points[num].Points, &kdbush.SimplePoint{rng.Float64()*24.0 + 24.0, rng.Float64()*24.0 + 24.0})
 		}
 		points[num].KDBush = kdbush.NewBush().
 			BuildIndex(points[num].Points, points[num].NodeSize)
@@ -85,6 +89,8 @@ func BenchmarkRange(b *testing.B) {
 
 // Benchmark Within func
 func BenchmarkWithin(b *testing.B) {
+	var rng = rand.New(rand.NewSource(1))
+
 	var points = []struct {
 		Points   []kdbush.Point
 		Total    int
@@ -108,7 +114,7 @@ func BenchmarkWithin(b *testing.B) {
 	// Setup
 	for num := range points {
 		for i := 0; i < points[num].Total; i++ {
-			points[num].Points = append(points[num].Points, &kdbush.SimplePoint{rand.Float64()*24.0 + 24.0, rand.Float64()*24.0 + 24.0})
+			points[num].Points = append(points[num].Points, &kdbush.SimplePoint{rng.Float64()*24.0 + 24.0, rng.Float64()*24.0 + 24.0})
 		}
 		points[num].KDBush = kdbush.NewBush().
 			BuildIndex(points[num].Points, points[num].NodeSize)
