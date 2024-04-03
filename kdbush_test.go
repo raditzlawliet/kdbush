@@ -40,9 +40,11 @@ var (
 
 // Test Build Index with more than 1k point
 func TestGeneration(t *testing.T) {
+	var rng = rand.New(rand.NewSource(1))
+
 	points2 := []kdbush.Point{}
 	for i := 0; i < 1_000; i++ {
-		points2 = append(points2, &kdbush.SimplePoint{rand.Float64()*24.0 + 24.0, rand.Float64()*24.0 + 24.0})
+		points2 = append(points2, &kdbush.SimplePoint{rng.Float64()*24.0 + 24.0, rng.Float64()*24.0 + 24.0})
 	}
 
 	bush := kdbush.NewBush()
