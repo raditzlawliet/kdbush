@@ -18,7 +18,7 @@ func NewBush() *KDBush {
 	return &kd
 }
 
-// BuildIndex bulding kd-tree index given list of Points
+// BuildIndex build kd-tree index given list of Points
 func (kd *KDBush) BuildIndex(points []Point, nodeSize int) *KDBush {
 	kd.indexed = false
 	kd.nodeSize = nodeSize
@@ -45,7 +45,7 @@ type query struct {
 	axis  int
 }
 
-// Range will return all indexes points across [minX], [minY], [maxX], [maxY]
+// Range returns all indexes points across [minX], [minY], [maxX], [maxY]
 func (kd *KDBush) Range(minX, minY, maxX, maxY float64) []int {
 	if !kd.indexed {
 		return []int{}
@@ -96,7 +96,7 @@ func (kd *KDBush) Range(minX, minY, maxX, maxY float64) []int {
 	return result
 }
 
-// Within will return all indexes points within radius of given single [Point]
+// Within returns all indexes points within radius of given single [Point]
 func (kd *KDBush) Within(qx, qy float64, radius float64) []int {
 	if !kd.indexed {
 		return []int{}
