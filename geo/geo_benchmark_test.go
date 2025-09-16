@@ -175,7 +175,7 @@ func BenchmarkGeo(b *testing.B) {
 	index2 := rng.Intn(len(cases[len(cases)-1].Points))
 	point2 := cases[len(cases)-1].Points[index2]
 
-	b.Run(fmt.Sprintf("Distance"), func(b *testing.B) {
+	b.Run("Distance", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			geo.Distance(point1.GetX(), point1.GetY(), point2.GetX(), point2.GetY())
 		}

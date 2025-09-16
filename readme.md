@@ -39,21 +39,21 @@ Before building index, you need to create list of Points by implement Point inte
 ```go
 // Point interface
 type Point interface {
-	GetX() (X float64)
-	GetY() (Y float64)
+  GetX() (X float64)
+  GetY() (Y float64)
 }
 
 // Example Simple Point implement Point Interface
 type SimplePoint struct {
-	X, Y float64
+  X, Y float64
 }
 
 func (p *SimplePoint) GetX() (X float64) {
-	return p.X
+  return p.X
 }
 
 func (p *SimplePoint) GetY() (Y float64) {
-	return p.Y
+  return p.Y
 }
 ```
 
@@ -146,9 +146,7 @@ return all indexes points within `radius` of given single point `x`, `y`
 
 ## Benchmark
 
-All benchmark are run on Go 1.20.3, Windows 11 & 12th Gen Intel(R) Core(TM) i7-12700H (Laptop version).
-
-**Do not trust benchmark**
+All benchmark are run on Go 1.20.3, Windows 11 & 12th Gen Intel(R) Core(TM) i7-12700H (Laptop version). **Do not trust benchmark**
 
 `go test -bench=. -benchmem`
 
