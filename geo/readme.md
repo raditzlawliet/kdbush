@@ -72,9 +72,7 @@ Returns great circle distance between two locations in kilometers.
 
 ## Benchmark
 
-All benchmark are run on Go 1.20.3, Windows 11 & 12th Gen Intel(R) Core(TM) i7-12700H (Laptop version).
-
-**Do not trust benchmark**
+All benchmark are run on Go 1.20.3, Windows 11 & 12th Gen Intel(R) Core(TM) i7-12700H (Laptop version). **Do not trust benchmark**
 
 `go test -bench=BenchmarkGeo -benchmem`
 

@@ -48,7 +48,7 @@ func Around(bush *kdbush.KDBush, lng, lat float64, maxResults int, maxDistanceIn
 			// add all points of the leaf node to the queue
 			for i := left; i <= right; i++ {
 				itemId := bush.GetIndexes()[i]
-				if predicate == nil || (predicate != nil && predicate(itemId)) {
+				if predicate == nil || predicate(itemId) {
 					heap.Push(&q, &geoNode{
 						itemID: nullInt{itemId, true},
 						dist:   haverSinDist(lng, lat, bush.GetCoords()[2*i], bush.GetCoords()[2*i+1], cosLat),
@@ -64,7 +64,7 @@ func Around(bush *kdbush.KDBush, lng, lat float64, maxResults int, maxDistanceIn
 
 			// add middle point to the queue
 			itemId := bush.GetIndexes()[mid]
-			if predicate == nil || (predicate != nil && predicate(itemId)) {
+			if predicate == nil || predicate(itemId) {
 				heap.Push(&q, &geoNode{
 					itemID: nullInt{itemId, true},
 					dist:   haverSinDist(lng, lat, midLng, midLat, cosLat),
